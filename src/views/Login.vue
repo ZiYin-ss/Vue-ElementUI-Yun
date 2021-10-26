@@ -52,7 +52,11 @@
             router.push('/home')
             postRequest('/login',this.loginForm).then(resp=>{
               if(resp){
+                // 存储用户token
                 const tokenStr = resp.obj.tokenHead+resp.obj.token;
+                window.sessionStorage.setItem(tokenStr)
+
+                // 跳转首页
                 this.$router.replace('/home')
               }
             })

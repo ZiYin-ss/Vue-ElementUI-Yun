@@ -2,6 +2,11 @@ import axios from 'axios'
 import {Message} from 'element-ui'
 import router from '../router'
 
+// 请求拦截器
+axios.interceptors.request.use(config=>{
+
+},error => {})
+
 
 // 响应拦截器
 //这个是整体的响应拦截器 因为无论请求那个url都会调用到这个axios的拦截器
