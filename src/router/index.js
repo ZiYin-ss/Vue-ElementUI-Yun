@@ -20,11 +20,26 @@ export default new VueRouter({
             query可以用name或者path来引入（不明白vue-router传参的可以参考我的另一篇文章vue-router中 query传参和params传参的区别和注意事项）
         */
         component: () => import("../views/Login"),
+        hidden:true
       },
       {
         path:'/home',
-        name:'Home',
+        name:'导航一',
         component: () => import("../views/Home"),
-      }
+        children:[
+          {
+            path:'/test1',
+            name:'选项1',
+            component:() => import("../views/Test1"),
+          },
+          {
+            path:'/test2',
+            name:'选项2',
+            component:() => import("../views/Test2"),
+          }
+        ]
+      },
+
+
   ]
 })

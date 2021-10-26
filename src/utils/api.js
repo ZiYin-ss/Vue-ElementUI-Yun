@@ -4,8 +4,16 @@ import router from '../router'
 
 // 请求拦截器
 axios.interceptors.request.use(config=>{
-
-},error => {})
+  // 如果存在token 那么请求会携带这个token
+  // 再说一遍这个是全局的所有请求都会经过 当然了第一次登录的时候也不需要加 登录之后做登录之后才能做的事 不就会判断是否登录
+  // 还记得django的request.user 用户登录之后产生了 一个user 现在知道怎么产生的吗
+  if(window.sessionStorage.getItem('tokenStr')){
+    config.headers['Authorization'] = window.sessionStorage.getItem('tokenStr')
+  }
+  return config
+},error => {
+  console.log(error)
+})
 
 
 // 响应拦截器
@@ -57,10 +65,28 @@ export const postRequest = (url,params)=>{
   })
 }
 
-
+// 传送json格式的put请求
 export const putRequest = (url,params)=>{
   return axios({
-    method:'post',
+    method:'put',
+    url:`${base}${url}`,
+    params:params
+  })
+}
+
+// 传送json格式的get请求
+export const getRequest = (url,params)=>{
+  return axios({
+    method:'get',
+    url:`${base}${url}`,
+    params:params
+  })
+}
+
+// 传送json格式的delete请求
+export const deleteRequest = (url,params)=>{
+  return axios({
+    method:'delete',
     url:`${base}${url}`,
     params:params
   })

@@ -1,6 +1,13 @@
 <template>
   <div>
-    <el-form :rules="rules" ref="loginForm" :model="loginForm" class="loginContainer">
+    <el-form :rules="rules"
+             v-loading="loading"
+             element-loading-text="正在登录中"
+             element-loading-spinner="el-icon-loading"
+             element-loading-background="rgba(0, 0, 0, 0.8)"
+             ref="loginForm"
+             :model="loginForm"
+             class="loginContainer">
       <h3 class="loginTitle">系统登录</h3>
       <el-form-item prop="username">
         <el-input type="text" auto-complete="false" v-model="loginForm.username" placeholder="请输入用户名"></el-input>
@@ -20,7 +27,6 @@
 </template>
 
 <script>
-  import {postRequest} from '@/utils/api'
   import router from '../router'
 
   export default {
@@ -34,6 +40,7 @@
           password:'123',
           code:''
         },
+        loading:false, //判断是否显示正在加载中 自己调
         checked:true,
         rules:{  // 这个是这个UI的方法 并不是vue的方法 怪不得没见过 在element UI文档就有
           username:[{required:true,message:'请输入用户名',trigger:'blur'}],
@@ -49,13 +56,16 @@
       submitLogin(){
         this.$refs.loginForm.validate((valid)=>{
           if(valid){
+            // 验证得时候是不是要加载
+            this.loading=true
             router.push('/home')
-            postRequest('/login',this.loginForm).then(resp=>{
+            this.postRequest('/login',this.loginForm).then(resp=>{
               if(resp){
-                // 存储用户token
+                // 完毕了是不是就跳转
+                this.loading=false
+                // 存储用户token sessionStorage存数据
                 const tokenStr = resp.obj.tokenHead+resp.obj.token;
-                window.sessionStorage.setItem(tokenStr)
-
+                window.sessionStorage.setItem('tokenStr',tokenStr)
                 // 跳转首页
                 this.$router.replace('/home')
               }
