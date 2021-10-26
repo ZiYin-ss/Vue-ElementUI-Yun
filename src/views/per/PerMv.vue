@@ -1,12 +1,12 @@
 <template>
   <div>
-    员工奖惩
+    员工调动
   </div>
 </template>
 
 <script>
 export default {
-  name: "perEc"
+  name: "PerMv"
 }
 </script>
 

@@ -1,12 +1,12 @@
 <template>
   <div>
-    员工培训
+    员工调薪
   </div>
 </template>
 
 <script>
 export default {
-  name: "perEmp"
+  name: "PerSalary"
 }
 </script>
 

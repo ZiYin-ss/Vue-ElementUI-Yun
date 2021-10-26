@@ -1,12 +1,12 @@
 <template>
   <div>
-    员工调动
+    员工资料
   </div>
 </template>
 
 <script>
 export default {
-  name: "perEmp"
+  name: "PerEmp"
 }
 </script>
 
