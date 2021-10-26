@@ -1,5 +1,6 @@
 import {getRequest} from '@/utils/api'
 
+
 export const initMenu =(router,store) =>{
   if(store.state.routes.length>0){
     return
@@ -29,7 +30,20 @@ export const formatRoutes=(routes) =>{
       icoCls:icoCls,
       children:children,
       component(resolve){
-        require(['../views/'+component+'.vue'],resolve)
+        if(component.startWith('Home')){
+          require(['../views/'+component+'.vue'],resolve)
+        }else if(component.startWith('Emp')){
+          require(['../views/emp/'+component+'.vue'],resolve)
+        }else  if(component.startWith('Per')){
+          require(['../views/per/'+component+'.vue'],resolve)
+        }else if(component.startWith('Sal')){
+          require(['../views/sal/'+component+'.vue'],resolve)
+        }else if(component.startWith('Sta')){
+          require(['../views/sta/'+component+'.vue'],resolve)
+        }else if(component.startWith('Sys')){
+          require(['../views/sys/'+component+'.vue'],resolve)
+        }
+
       }
     }
     //  注意这个地方有点难理解 其实就是fmRouter这个东西其实就是路由routes里面的一个个路由啊

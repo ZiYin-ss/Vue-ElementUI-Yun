@@ -5,6 +5,8 @@ import App from './App.vue'
 import router from  './router'
 import store from './store'
 import {postRequest,getRequest,putRequest,deleteRequest} from './utils/api'
+import {initMenu} from '@/utils/menus'
+import 'font-awesome/css/font-awesome.css'
 
 // 关闭控制台提示 浏览器里面
 Vue.config.productionTip = false
@@ -16,6 +18,26 @@ Vue.prototype.postRequest = postRequest;
 Vue.prototype.getRequest = getRequest;
 Vue.prototype.putRequest = putRequest;
 Vue.prototype.deleteRequest = deleteRequest;
+
+router.beforeEach((to,from,next)=>{
+  // 这个地方就判断是不是登录
+  // 就是说在每次路由跳转的时候 都要初始化一下菜单 要不然不见了
+  if(window.sessionStorage.getItem('tokenStr')) {
+    initMenu(router, store)
+    // 判断用户信息是否存在
+    if(!window.sessionStorage.getItem('user')){
+      return getRequest('/admin/info').then(resp=>{
+        if (resp){
+          window.sessionStorage.setItem('user',JSON.stringify(resp))
+          next()
+        }
+      })
+    }
+    next()
+  }else {
+      next()
+  }
+})
 
 new Vue({
   router,
