@@ -21,25 +21,6 @@ export default new VueRouter({
         */
         component: () => import("../views/Login"),
         hidden:true
-      },
-      {
-        path:'/home',
-        name:'导航一',
-        component: () => import("../views/Home"),
-        children:[
-          {
-            path:'/test1',
-            name:'选项1',
-            component:() => import("../views/Test1"),
-          },
-          {
-            path:'/test2',
-            name:'选项2',
-            component:() => import("../views/Test2"),
-          }
-        ]
-      },
-
-
+      }
   ]
 })

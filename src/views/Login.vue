@@ -58,7 +58,6 @@
           if(valid){
             // 验证得时候是不是要加载
             this.loading=true
-            router.push('/home')
             this.postRequest('/login',this.loginForm).then(resp=>{
               if(resp){
                 // 完毕了是不是就跳转
@@ -67,11 +66,14 @@
                 const tokenStr = resp.obj.tokenHead+resp.obj.token;
                 window.sessionStorage.setItem('tokenStr',tokenStr)
                 // 跳转首页
-                this.$router.replace('/home')
+                // 这个地方不理解的话 可以认为是固定的写法
+                // 前置路由的时候 设置了redirect 然后查询出来 路径 下面跳转 这个地方就是这样写的
+                let path =this.$route.query.redirect;
+                this.$router.replace((path==='/'||path===undefined)?'/home':path)
               }
             })
           }else {
-            this.$message.error('这个是一条错误信息')
+            this.$message.error('请输入所有字段')
             return false
           }
         })

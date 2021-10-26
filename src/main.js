@@ -35,7 +35,12 @@ router.beforeEach((to,from,next)=>{
     }
     next()
   }else {
-      next()
+      if(to.path=='/'){
+        next();
+      }else{
+        // 其实这个地方是 添加了?redirect = to.path
+        next('/redirect='+to.path)
+      }
   }
 })
 

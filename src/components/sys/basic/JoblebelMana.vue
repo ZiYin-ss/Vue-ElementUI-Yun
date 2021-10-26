@@ -1,12 +1,12 @@
 <template>
   <div>
-    test2
+    职称管理
   </div>
 </template>
 
 <script>
 export default {
-  name: "Test2"
+  name: "JoblebelMana"
 }
 </script>
 
