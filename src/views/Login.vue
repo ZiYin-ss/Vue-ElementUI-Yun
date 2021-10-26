@@ -20,6 +20,9 @@
 </template>
 
 <script>
+  import {postRequest} from '@/utils/api'
+  import router from '../router'
+
   export default {
     name: "Login",
     data(){
@@ -46,7 +49,13 @@
       submitLogin(){
         this.$refs.loginForm.validate((valid)=>{
           if(valid){
-            alert('submit!');
+            router.push('/home')
+            postRequest('/login',this.loginForm).then(resp=>{
+              if(resp){
+                const tokenStr = resp.obj.tokenHead+resp.obj.token;
+                this.$router.replace('/home')
+              }
+            })
           }else {
             this.$message.error('这个是一条错误信息')
             return false
@@ -75,5 +84,9 @@
   .loginRemember{
     text-align: left;
     margin: 0px 0px 15px 0px ;
+  }
+  .el-form-item__content{
+    display: flex;
+    align-items: center;
   }
 </style>

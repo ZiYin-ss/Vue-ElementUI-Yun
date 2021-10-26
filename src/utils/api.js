@@ -51,3 +51,12 @@ export const postRequest = (url,params)=>{
     params:params
   })
 }
+
+
+export const putRequest = (url,params)=>{
+  return axios({
+    method:'post',
+    url:`${base}${url}`,
+    params:params
+  })
+}
