@@ -7,6 +7,7 @@ import store from './store'
 import {postRequest,getRequest,putRequest,deleteRequest} from './utils/api'
 import {initMenu} from '@/utils/menus'
 import 'font-awesome/css/font-awesome.css'
+import {downloadRequest} from '@/utils/download'
 
 // 关闭控制台提示 浏览器里面
 Vue.config.productionTip = false
@@ -18,6 +19,7 @@ Vue.prototype.postRequest = postRequest;
 Vue.prototype.getRequest = getRequest;
 Vue.prototype.putRequest = putRequest;
 Vue.prototype.deleteRequest = deleteRequest;
+Vue.prototype.downloadRequest = downloadRequest
 
 router.beforeEach((to,from,next)=>{
   // 这个地方就判断是不是登录

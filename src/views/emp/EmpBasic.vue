@@ -13,17 +13,25 @@
         </el-input>
         <el-button type="primary" icon="el-icon-search" @click="initEmps">搜索</el-button>
         <el-button type="primary">
-          <i class="fa fa-angle-double-down" aria-hidden="true"></i>
+          <i class="" aria-hidden="true"></i>
           高级搜索
         </el-button>
       </div>
       <div>
-        <el-button type="success">
-          <i class="fa fa-level-up" aria-hidden="true"></i>
-          导入数据
-        </el-button>
-        <el-button type="success">
-          <i class="fa fa-level-down" aria-hidden="true"></i>
+        <el-upload
+            :before-upload="beforeUpdate"
+            :headers="headers"
+            style="display: inline-flex;margin-right: 8px;"
+            :show-file-list="false"
+            :on-success="onSuccess"
+            :on-error="onError"
+            :disabled="importDataDisabled"
+            action="/employee/basic/import">
+          <el-button :icon="importDataBtnIcon" type="success"  :disabled="importDataDisabled">
+            {{ importDataBtnText }}
+          </el-button>
+        </el-upload>
+        <el-button @click="exportDate" icon="el-icon-download" type="success">
           导出数据
         </el-button>
         <el-button type="primary" icon="el-icon-plus" @click="showAddEmpView">添加员工</el-button>
@@ -207,9 +215,9 @@
             fixed
             width="200">
           <template slot-scope="scope">
-            <el-button style="padding:3px" size="mini">编辑</el-button>
+            <el-button style="padding:3px" @click="showEditEmpView(scope.row)" size="mini">编辑</el-button>
             <el-button style="padding:3px" size="mini" type="primary">查看高级资料</el-button>
-            <el-button style="padding:3px" size="mini" type="danger">删除</el-button>
+            <el-button @click="deleteEmp(scope.row)" style="padding:3px" size="mini" type="danger">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -224,7 +232,7 @@
       </div>
     </div>
     <el-dialog
-        title="添加员工"
+        title="title"
         :visible.sync="dialogVisible"
         width="80%">
       <div>
@@ -335,6 +343,10 @@
     name: "EmpBasic",
     data(){
       return {
+        importDataDisabled:false,
+        importDataBtnText:'导入数据',
+        importDataBtnIcon:'el-icon-upload2',
+        title:'',
         inputDepName:'',
         emps:[],
         loading:false,
@@ -343,7 +355,11 @@
         size:10,
         empName:'',
         dialogVisible:false,
+        headers:{
+          Authorization : window.sessionStorage.getItem('tokenStr')
+        },
         emp:{
+          id:null,
           name:'',
           birthday:'',
           gender:'',
@@ -396,6 +412,22 @@
       this.initData()
     },
     methods:{
+      onSuccess(){
+        this.importDataBtnText='导入数据'
+        this.importDataBtnIcon='el-icon-upload2'
+        this.initEmps()
+        this.importDataDisabled = false
+      },
+      onError(){
+        this.importDataBtnText='导入数据'
+        this.importDataBtnIcon='el-icon-upload2'
+        this.importDataDisabled = false
+      },
+      beforeUpdate(){
+        this.importDataBtnIcon = 'el-icon-loading'
+        this.importDataBtnText = '正在导入'
+        this.importDataDisabled = true
+      },
       showDepView(){
         this.visible = !this.visible
       },
@@ -407,7 +439,40 @@
         })
       },
       showAddEmpView(){
+        this.title = '添加数据'
         this.getMaxWorkID()
+        this.emp={
+            id:null,
+            name:'',
+            birthday:'',
+            gender:'',
+            idCard:'',
+            wedlock:'',
+            nationId:null,
+            nativePlace:'',
+            politicId:null,
+            email:'',
+            phone:'',
+            address:'',
+            departmentId:null,
+            jobLevelId:null,
+            posId:null,
+            engageForm:'',
+            tiptopDegree:'',
+            specialty:'',
+            school:'',
+            beginDate:'',
+            workState:'在职',
+            workId:null,
+            contractTerm:null,
+            conversionTime:'',
+            notWorkDate:null,
+            beginContract:'',
+            endContract:'',
+            workAge:null,
+            salaryId:null
+        }
+        this.inputDepName = ''
         this.initPositions()
         this.dialogVisible=true
       },
@@ -484,17 +549,60 @@
         this.visible = !this.visible
       },
       doAddEmp(){
-        this.$refs['empForm'].validate(valid=>{
-          if(valid){
-            this.postRequest('/employee/basic/',this.emp).then(resp=>{
-              if(resp){
-                this.dialogVisible = false;
-                this.initEmps()
-              }
-            })
-          }
-        })
+        // 添加是没有id的 修改是有id的
+        if(this.emp.id){
+          this.$refs['empForm'].validate(valid=>{
+            if(valid){
+              this.putRequest('/employee/basic/',this.emp).then(resp=>{
+                if(resp){
+                  this.dialogVisible = false;
+                  this.initEmps()
+                }
+              })
+            }
+          })
+        }else {
+          this.$refs['empForm'].validate(valid=>{
+            if(valid){
+              this.postRequest('/employee/basic/',this.emp).then(resp=>{
+                if(resp){
+                  this.dialogVisible = false;
+                  this.initEmps()
+                }
+              })
+            }
+          })
+        }
+
       },
+      deleteEmp(data){
+        this.$confirm('此操作将永久删除'+data.name+'该员工, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteRequest('/employee/basic/'+data.id).then(resp=>{
+            if(resp){
+              this.initEmps()
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      },
+      showEditEmpView(data){
+        this.title = '编辑员工信息'
+        this.dialogVisible = true
+        this.inputDepName = data.departmentId.name
+        this.emp =data
+        this.initPositions()
+      },
+      exportDate(){
+        this.downloadRequest('/employee/basic/export')  //在这个函数里面其实是做了下载操作的 依靠js-file-download 下载 就这
+      }
     }
   }
 </script>
