@@ -72,7 +72,7 @@ export default {
             let sr = this.selectRoles[j];
             if(role.id===sr){
               roles.splice(i,1)
-              i--;
+              i--;  //这个地方i--是为了防止 就是这个里面删除的 roles长度减少但索引加加的问题
               break;
             }
           }
@@ -81,8 +81,6 @@ export default {
           flag = true
         }
       }
-
-
       if(flag){
         let url = '/system/admin/role?adminId='+admin.id
         this.selectRoles.forEach(sr=>{
