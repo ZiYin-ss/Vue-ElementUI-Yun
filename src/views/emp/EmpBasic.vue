@@ -228,7 +228,7 @@
         :visible.sync="dialogVisible"
         width="80%">
       <div>
-        <el-form ref="empForm" :model="emp">
+        <el-form ref="empForm" :model="emp" :rules="rules">
           <el-row>
             <el-col :span="6">
               <el-form-item label="姓名:" prop="name">
@@ -292,11 +292,39 @@
               </el-form-item>
             </el-col>
           </el-row>
+          <el-row>
+            <el-col :span="5">
+              <el-form-item label="所属部门" prop="departmentId">
+                <el-popover
+                    placement="bottom"
+                    title="请选择部门"
+                    width="200"
+                    trigger="manual"
+                    v-model="visible">
+                  <el-tree :data="allDeps"
+                           default-expand-all
+                           :props="defaultProps"
+                           @node-click="handleNodeClick"></el-tree>
+                  <div slot="reference"
+                       @click="showDepView"
+                       style="width: 150px; align-items:center; display: inline-flex;cursor:pointer; border-radius: 5px; border: 1px solid #dedede;height: 24px;">
+                    {{inputDepName}}
+                  </div>
+                </el-popover>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+            </el-col>
+            <el-col :span="6">
+            </el-col>
+            <el-col :span="7">
+            </el-col>
+          </el-row>
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="doAddEmp">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -307,6 +335,7 @@
     name: "EmpBasic",
     data(){
       return {
+        inputDepName:'',
         emps:[],
         loading:false,
         total:0,
@@ -334,7 +363,7 @@
           specialty:'',
           school:'',
           beginDate:'',
-          workState:'',
+          workState:'在职',
           workId:null,
           contractTerm:null,
           conversionTime:'',
@@ -348,7 +377,18 @@
         joblevels:[],
         politicsstatus:[],
         positions:[],
-        tiptopDegrees:['博士','硕士','本科','大专','高中','初中','小学','其他']
+        tiptopDegrees:['博士','硕士','本科','大专','高中','初中','小学','其他'],
+        visible:false,
+        defaultProps:{
+          children: 'children',
+          label: 'name'
+        },
+        allDeps:[],
+        rules:{
+          name:[{required:true,message:'请输入员工姓名',trigger:'blur'}],
+          gender:[{required:true,message:'请输入员工性别',trigger:'blur'}],
+          departmentId:[{required:true,message:'请输入部门ID',trigger:'blur'}],
+        },
       }
     },
     mounted() {
@@ -356,6 +396,9 @@
       this.initData()
     },
     methods:{
+      showDepView(){
+        this.visible = !this.visible
+      },
       getMaxWorkID(){  //这个是会直接获取到最大的id 显示在框框那
         this.getRequest('/employee/basic/maxWorkID').then(resp=>{
           if(resp){
@@ -417,6 +460,16 @@
         }else {
           this.nations = JSON.parse(window.sessionStorage.getItem('politicsstatus'))
         }
+        if(!window.sessionStorage.getItem('allDeps')){
+          this.getRequest('/employee/basic/deps').then(resp=>{
+            if(resp){
+              this.allDeps = resp
+              window.sessionStorage.setItem('allDeps',JSON.stringify(resp));
+            }
+          })
+        }else {
+          this.nations = JSON.parse(window.sessionStorage.getItem('allDeps'))
+        }
       },
       initPositions() {
         this.getRequest('/employee/basic/positions').then(resp=>{
@@ -424,7 +477,24 @@
             this.positions = resp
           }
         })
-      }
+      },
+      handleNodeClick(data){
+        this.inputDepName = data.name
+        this.emp.departmentId = data.id
+        this.visible = !this.visible
+      },
+      doAddEmp(){
+        this.$refs['empForm'].validate(valid=>{
+          if(valid){
+            this.postRequest('/employee/basic/',this.emp).then(resp=>{
+              if(resp){
+                this.dialogVisible = false;
+                this.initEmps()
+              }
+            })
+          }
+        })
+      },
     }
   }
 </script>
