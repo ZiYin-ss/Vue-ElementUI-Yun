@@ -21,6 +21,18 @@ export default new VueRouter({
         */
         component: () => import("../views/Login"),
         hidden:true
-      }
+      },
+    {
+      path:'/home',
+      name:'Home',
+      component: () => import("../views/Home"),
+      children:[
+        {
+          path: '/chat',
+          name: '在线聊天',
+          component: () => import("../views/chat/FriendChat"),
+        }
+      ]
+    }
   ]
 })
