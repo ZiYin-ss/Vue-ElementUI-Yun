@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import SockJs from 'sockjs-client'
+import Stomp from 'stompjs'
 
 Vue.use(Vuex)
 const now = new Date();
@@ -41,7 +43,8 @@ const store = new Vuex.Store({
       }
     ],
     currentSessionId:1,
-    filterKey:''
+    filterKey:'',
+    stomp:null
   },
   mutations: {
     initRoutes(state, data) {
@@ -68,6 +71,21 @@ const store = new Vuex.Store({
     }
   },
   actions:{
+    connect(context){
+      // 先连接
+      context.state.stomp = Stomp.over(new SockJs('/ws/ep'));
+      let token = window.sessionStorage.getItem('tokenStr')
+      // 也需要jwt令牌的 然后把这个toke发给后端
+      // 连接wsep端点 订阅消息频道 拿到msg回调获取消息体
+      // 其实这个地方和python的tcp和udp连接很像 是不是建立了端口 发送了数据 来回发送不也可以吗
+      context.state.stomp.connect({'Auth-Token':token},success=>{
+        context.state.stomp.subscribe('/user/queue/chat',msg=>{
+          console.log(msg.body)
+        })
+      },error=>{
+
+      })
+    },
     initData (context) {
       context.commit('INIT_DATA')
     }

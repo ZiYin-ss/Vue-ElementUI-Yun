@@ -13,6 +13,8 @@ export const initMenu =(router,store) =>{
       router.addRoutes(fmtRoutes)
       //  存储数据
       store.commit('initRoutes',fmtRoutes)
+      // 连接websock
+      store.dispatch('connect')
     }
   })
 }
